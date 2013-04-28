@@ -19,21 +19,19 @@ var DBConnector = (function() {
 
         for (var i=0; i<_pool_size; ++i)
         {
-            this.pool[i] = new Server(this.host, this.port, {auto_reconnect: true});
-            this.pool[i] = {
-                'server': this.pool[i], 
+            var server = new Server(this.host, this.port, {auto_reconnect: true}),
                 //safe for single node
                 //waits for every write for fsync and journal
-                'db': new Db(this.name, this.pool[i], {fsync:true})
-            };
+                db = new Db(this.name, server, {fsync:true});
 
-            this.pool[i].db.open(function(err, db) {
+            this.pool[i] = { 'server': server, 'db': db };
+
+            db.open(function(err, db) {
                 if ( !err ) {
                     console.log('connection[' + i + ']');
                 }
             });
         }
-        
 	}
 
     _constructor.prototype.db = function() {

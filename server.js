@@ -1,6 +1,5 @@
 var express = require('express'),
 	app = express(),
-	AuthRoute = require('./routes/authroute'),
     AdminRoute = require('./routes/adminroute');
 
 app.configure(function () {
@@ -8,9 +7,11 @@ app.configure(function () {
 	app.use(express.bodyParser());
 });
 
-app.get('/signin', AuthRoute.signin);
-app.get('/signup', AuthRoute.signup);
-app.get('/admin/create', AdminRoute.createAdmin);
+//TODO: methods must be configured RESTfully
+app.post('/admin/create', AdminRoute.create);
+app.get('/admin/list', AdminRoute.list);
+app.delete('/admin/remove/:id', AdminRoute.remove);
+app.delete('/admin/removeAll', AdminRoute.removeAll);
 
 app.listen(3000);
 console.log('Listening on port 3000...');
