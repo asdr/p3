@@ -1,5 +1,5 @@
 var express = require('express'),
-	app = express(),
+    app = express(),
     AuthRoute = require('./routes/authroute');
     AdminRoute = require('./routes/adminroute');
 
@@ -9,8 +9,8 @@ app.configure(function () {
 });
 
 //TODO: methods must be configured RESTfully
-
 app.post('/signin', AuthRoute.signin);
+app.get('/signout', AuthRoute.signout);
 app.post('/admin/create', AdminRoute.create);
 app.get('/admin/list', AdminRoute.list);
 app.delete('/admin/remove/:id', AdminRoute.remove);

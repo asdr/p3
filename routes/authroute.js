@@ -16,9 +16,25 @@ var AuthRoute = (function() {
 		res.send (Auth.signup({}));
 	}
 
+	function signout( req, res ) {
+		Auth.signout( function(err, status) {
+			if ( status === true )
+			{
+				res.setHeader('Content-Type', 'application/json');
+				res.send("{ 'status': 'ok' }");
+			}
+			else
+			{
+				res.setHeader('Content-Type', 'application/json');
+				res.send("{ 'error': true }");
+			}
+		} );
+	}
+
 	return {
 		'signin': signin,
-		'signup': signup
+		'signup': signup,
+		'signout': signout
 	};
 
 })();

@@ -83,9 +83,15 @@ var Auth = (function() {
 			return false;
 	}
 
+	function signout ( callback ) {
+		isAdmin = isLecturer = isStudent = signedInUser = false;
+		callback.call( $this, false, true );
+	}
+
 	return {
 		'signin': signin,
-		'signup': signup
+		'signup': signup,
+		'signout': signout
 	};
 
 })();
