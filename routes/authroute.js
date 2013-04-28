@@ -3,7 +3,13 @@ var Auth = require('../core/auth');
 var AuthRoute = (function() {
 
 	function signin( req, res ) {
-		res.send (Auth.signin({}));
+		Auth.signin( req.body, function(err, object) {
+			//if (!err)
+			//{
+				res.setHeader('Content-Type', 'application/json');
+				res.send( JSON.stringify( object ) );
+			//}
+		});
 	}
 
 	function signup( req, res ) {
