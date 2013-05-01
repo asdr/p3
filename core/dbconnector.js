@@ -2,65 +2,62 @@ var mongo = require('mongodb'),
     Server = mongo.Server,
     Db = mongo.Db;
 
-var DBConnector = (function() {
+var _default_db_host = 'localhost',
+    _default_db_port = 27017,
+    _default_db_name = 'p3db',
+    _instance = null,
 
-    var _default_db_host = 'localhost',
-        _default_db_port = 27017,
-        _default_db_name = 'p3db',
-        _instance = null,
-        _pool_size = 1;
+    // actuall, mongodb has an inner pool for concurrent db actions
+    // but, i didn't know this before.
+    _pool_size = 1;
 
-    function _constructor ( options ) {
-        this.host = options.host || _default_db_host;
-        this.port = options.port || _default_db_port;
-        this.name = options.name || _default_db_name;
-        this.pool = new Array( _pool_size ),
-        this.next_db = 0;
+var DBConnector = function( options ) {
+    this.host = options.host || _default_db_host;
+    this.port = options.port || _default_db_port;
+    this.name = options.name || _default_db_name;
+    this.pool = new Array( _pool_size ),
+    this.next_db = 0;
 
-        for (var i=0; i<_pool_size; ++i)
-        {
-            var server = new Server(this.host, this.port, {auto_reconnect: true}),
-                //safe for single node
-                //waits for every write for fsync and journal
-                db = new Db(this.name, server, {fsync:true});
+    for (var i=0; i<_pool_size; ++i)
+    {
+        var server = new Server(this.host, this.port, {auto_reconnect: true, poolSize: 5}),
+            //safe for single node
+            //waits for every write for fsync and journal
+            db = new Db(this.name, server, {fsync:true});
 
-            this.pool[i] = { 'server': server, 'db': db };
+        this.pool[i] = { 'server': server, 'db': db };
 
-            db.open(function(err, db) {
-                if ( !err ) {
-                    console.log('connection[' + i + ']');
-                }
-            });
-        }
+        db.open(function(err, db) {
+            if ( !err ) {
+                console.log('connection[' + i + ']');
+            }
+        });
     }
+};
 
-    _constructor.prototype.db = function() {
-        return this.pool[ this.next_db++ % _pool_size ].db;
-    };
+DBConnector.prototype.db = function() {
+    this.next_db = (this.next_db + 1) % _pool_size;
+    return this.pool[ this.next_db ].db;
+};
 
-    _constructor.prototype.close = function() {
-        //TODO: close connection
-        for (var i=0; i<_pool_size; ++i)
-        {
-            this.pool[i].db.close(function(err) {
-                if ( !err ) {
-                    console.log('close[' + i + '].');
-                }
-            });
-        }
-    };
-
-    function _getInstance( options ) {
-        return _instance || ( _instance = new _constructor(options||{}) );
+DBConnector.prototype.close = function() {
+    //TODO: close connection
+    for (var i=0; i<_pool_size; ++i)
+    {
+        this.pool[i].db.close(function(err) {
+            if ( !err ) {
+                console.log('close[' + i + '].');
+            }
+        });
     }
+};
 
-    return {
-        DEFAULT_DB_HOST: _default_db_host,
-        DEFAULT_DB_PORT: _default_db_port,
-        DEFAULT_DB_NAME: _default_db_name,
-        getInstance: _getInstance
-    };
+DBConnector.getInstance = function( options ) {
+    return _instance || ( _instance = new DBConnector(options||{}) );
+}
 
-})();
+DBConnector.DEFAULT_DB_HOST = _default_db_host;
+DBConnector.DEFAULT_DB_PORT = _default_db_port;
+DBConnector.DEFAULT_DB_NAME = _default_db_name;
 
 module.exports = DBConnector;
