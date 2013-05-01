@@ -4,8 +4,8 @@ var express = require('express'),
     AdminRoute = require('./routes/adminroute');
 
 app.configure(function () {
-	app.use(express.logger('dev')); /* 'default', 'short', 'tiny', 'dev' */
-	app.use(express.bodyParser());
+    app.use(express.logger('dev')); /* 'default', 'short', 'tiny', 'dev' */
+    app.use(express.bodyParser());
 });
 
 //TODO: methods must be configured RESTfully
