@@ -1,0 +1,34 @@
+<% 
+    if (signedInUser) {
+        if (signedInUser.isAdmin === true) {
+    %>
+<li><a href="#">Admin Operations</a></li>
+<li><a href="#">Course Operations</a></li>
+<li><a href="#">Instructor Operations</a></li>
+<li><a href="#">Student Operations</a></li>
+    <%
+        }
+
+        if (signedInUser.isInstructor === true) {
+    %>
+<li><a href="#">Display Document</a></li>
+<li><a href="#">Evaluate Document</a></li>
+<li><a href="#">Course Report</a></li>
+    <%
+        }
+        
+        if (signedInUser.isStudent === true) {
+    %>
+<li><a href="#">Upload Document</a></li>
+<li><a href="#">Display Grades/Comments</a></li>
+<li><a href="#">Modify Title/Advisor</a></li>
+    <%
+        }
+    }
+    else
+    {
+    %>
+        not logged in!
+    <%
+    }
+%>

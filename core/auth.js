@@ -1,97 +1,77 @@
-var DBConnector = require('./dbconnector').getInstance(),
-    Admin = require('../model/admin'),
-    Lecturer = require('../model/lecturer'),
-    Student = require('../model/student');
+var _ = require('underscore'),
+    DBConnector = require('./dbconnector').getInstance(),
+    User = require('../model/User'),
+    UserRole = require('./UserRole'); 
 
 var Auth = (function() {
 
-    var $this = this,
-        isAdmin = false,
-        isLecturer = false,
-        isStudent = false,
-        signedInUser = null;
+    var $this = this;
+
+    function call_boun_mail_service( service_name, parameters, callback ) {
+        // whenever a service call is asked for, it return true as successful
+        var result = {
+            'status': 'OK'
+        };
+        callback.call(result, result.status);
+    }
 
     function signin( data, callback ) {
-        var db = DBConnector.db();
-
+        
         if ( !(data && data['email'] && data['password']) )
         {
             callback.call($this, true, { 'message': 'email and password is required' });
             return;
         }
 
-        Admin.get( data, function(err, admins) {
-            if (err)
+        call_boun_mail_service('login', { 'username': data['email'], 'password': data['password'] }, function(status) {
+            if ( status === 'OK' )
             {
-                callback.call($this, true, err);
-                return;
-            }
+                // we dont care the password, it's boun's business
+                delete data.password;
 
-            // not an admin !
-            if ( admins.length == 0 )
-            {
-                Lecturer.get( data, function(err, lecturers) {
+                User.get ( data, function(err, users) {
                     if (err)
                     {
                         callback.call($this, true, err);
                         return;
                     }
 
-                    // not a lecturer !
-                    if ( lecturers.length == 0 )
+                    if ( users.length == 0 ) 
                     {
-                        Student.get( data, function(err, students) {
-                            if (err)
-                            {
-                                callback.call($this, true, err);
-                                return;
-                            }
-
-                            // not a student
-                            if ( students.length == 0 )
-                            {
-                                callback.call( $this, false, false );
-                            }
-                            else
-                            {
-                                isStudent = true;
-                                signedInUser = students[0];
-                                callback.call( $this, false, students[0] );
-                            }
-
-                        } );
+                        callback.call( $this, true, { "message": "user role not defined" } );
                     }
-                    else
+                    else 
                     {
-                        isLecturer = true;
-                        signedInUser = lecturers[0];
-                        callback.call( $this, false, lecturers[0] );
+                        var theUser = _.clone(users[0]);
+                        theUser.role = [];
+                        for (var i=0, len=users.length; i<len; ++i) {
+                            
+                            theUser.role.push(users[i].role);
+
+                            if (users[i].role == UserRole.Administrator) {
+                                theUser.isAdmin = true;
+                            } 
+                            else if (users[i].role == UserRole.Instructor) {
+                                theUser.isInstructor = true;
+                            }
+                            else if (users[i].role == UserRole.Student) {
+                                theUser.isStudent = true;
+                            }
+                        }
+
+                        callback.call( $this, false, theUser );
                     }
-                } );
+                });
             }
             else
             {
-                isAdmin = true;
-                signedInUser = admins[0];
-                callback.call( $this, false, admins[0] );
+                callback.call( $this, true, '{ "message": "check email address and password" }' );
             }
-        } );
-    }
-
-    function signup( data ) {
-        if ( !data )
-            return false;
-    }
-
-    function signout ( callback ) {
-        isAdmin = isLecturer = isStudent = signedInUser = false;
-        callback.call( $this, false, true );
+        });
     }
 
     return {
         'signin': signin,
-        'signup': signup,
-        'signout': signout
     };
 
 })();

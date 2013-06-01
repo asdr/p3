@@ -1,0 +1,13 @@
+.pues-body { position: absolute; width: 600px; }
+.pues-header { position: relative; width: 100%; height: 60px; background-color: #AFDCD4; }
+
+.pues-header>.title { }
+.pues-header>.signin { display: none; }
+.pues-header>.signout { display: none; }
+
+.pues-content { position:relative; width: 100%; min-height: 480px; }
+.pues-content .content-title { font-size: 21px; text-align: left; padding-bottom: 10px; }
+.pues-footer { position: relative; width: 100%; height: 60px; background-color: #AFDCD4; }
+
+.pues-admin-content { padding-top: 10px; }
+.courses-crud-area { padding-top: 10px; }

@@ -1,0 +1,32 @@
+<div id="header_logo">PUES v1</div>
+<div id="header_signin">
+    <ul>
+        <% if (!signedInUser) { %>
+        <li><a class="signup" href="#">Sign Up</a></li>
+        <li><a class="signin" href="#">Sign In</a></li>
+        <li><a class="about" href="#">About</a></li>
+        <% } else { %>
+        <li><a class="user_email" href="#"><%= signedInUser.email %></a></li>
+        <li><a class="about" href="#">About</a></li>
+        <% } %>
+    </ul>
+</div>
+<div id="content">
+    <div id="sidebar">
+        <div class="background"> </div>
+        <div class="scroller">
+            <div id="sidebar_content">
+                <ul>
+                    <%- include sidebar.ejs %>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="panel_container">
+        <div class="page"></div>
+        <div class="announcements">
+            <ul>
+            </ul>
+        </div>
+    </div>
+</div>

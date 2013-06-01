@@ -14,7 +14,7 @@ var DAO = function( collection_name ) {
             collection.insert( object, {fsync: true}, callback );
         });
     }
-
+    
     function _update( key, object, callback )
     {
         var db = DBConnector.db();
