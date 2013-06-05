@@ -29,7 +29,7 @@ AdminController.getAdmin({}, function(err, admins) {
             'email': 'admin'
             ,'firstname': 'admin'
             ,'lastname':'admin'
-        }, function(err,) {
+        }, function(err) {
             ;
         });
     }
