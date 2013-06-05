@@ -25,7 +25,7 @@
     function load( options ) {
 
         var defaultOptions = {
-            'selector': document.body
+            'selector': '.panel_container > .page'
             ,'clearBeforeLoad': false
             ,'params': ''
             ,'data': {}
@@ -44,7 +44,7 @@
             }
 
             container
-                .addClass(options.viewName)
+                //.addClass(options.viewName)
                 .append(html);
              
             setTimeout(function() {

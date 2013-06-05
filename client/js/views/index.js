@@ -3,7 +3,6 @@
     function signin_pressed() {
         PUES.ViewLoader.load({
             'viewName': 'signin'
-            ,'selector': '.panel_container > .page'
         });
     }
 
@@ -24,7 +23,6 @@
 
         PUES.ViewLoader.triggerLoaded({
             'viewName': 'sidebar'
-            ,'selector': '#sidebar_content > ul'
         });
     });
 

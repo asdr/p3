@@ -36,7 +36,7 @@ var StudentController = (function() {
         }
         else
         {
-            callback.call(this, false, {  }});
+            callback.call(this, false, '{ "message": "Couldnt create students." }');
         }
     }
 
@@ -53,7 +53,7 @@ var StudentController = (function() {
     }
 
     return {
-        'createStudent': createStudent,
+        'createStudent': createStudent
         ,'bulkCreateStudent': bulkCreateStudent
         ,'updateStudent': updateStudent
         ,'removeStudent': removeStudent

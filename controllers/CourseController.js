@@ -66,7 +66,7 @@ var CourseController = (function() {
     }
 
     function removeCourse(key, course, callback) {
-        Course.update(course, callback);
+        Course.remove(course, callback);
     }
 
     function getCourse(key, callback) {
@@ -79,19 +79,21 @@ var CourseController = (function() {
         // there may be at most 8 project types, and 
         // 5 of those are predefined, fixed ones. So, 
         // at most 3 more projecttype can be defined.
-        Course.get(key, function(courses) {
+        Course.get(key, function(err, courses) {
 
-            if ( courses.length == 0 ) {
-                //
-                callback.call( this, false, '{ "message": "Course not found." }' );
-            }
-            else
-            {
-                var updatedCourse = _.clone(courses[0]);
-                delete updatedCourse.projectTypes;
-                updatedCourse.projectTypes = _.union(courses[0].projectTypes, [ projectType ]);
+            if (!err) {
+                if ( courses.length == 0 ) {
+                    //
+                    callback.call( this, false, '{ "message": "Course not found." }' );
+                }
+                else
+                {
+                    var updatedCourse = _.clone(courses[0]);
+                    delete updatedCourse.projectTypes;
+                    updatedCourse.projectTypes = _.union(courses[0].projectTypes, [ projectType ]);
 
-                Course.update({ '_id': courses[0]._id }, updatedCourse, callback);
+                    Course.update({ '_id': courses[0]._id.toString() }, updatedCourse, callback);
+                }
             }
 
         });
@@ -103,7 +105,7 @@ var CourseController = (function() {
         // there may be at most 8 project types, and 
         // 5 of those are predefined, fixed ones. So, 
         // at most 3 more projecttype can be defined.
-        Course.get(key, function(courses) {
+        Course.get(key, function(err, courses) {
 
             if ( courses.length == 0 ) {
                 //
@@ -114,27 +116,27 @@ var CourseController = (function() {
                 var updatedCourse = _.clone(courses[0]);
                 
                 var newProjectTypes = [];
-                for (var i=0, len=updatedCourse.projectTypes.length; i<len: ++i) {
+                for (var i=0, len=updatedCourse.projectTypes.length; i<len; ++i) {
                     if (updatedCourse.projectTypes[i].name != projectType.name) {
                         newProjectTypes.push(updatedCourse.projectTypes[i]);
                     }
                 }
                 updatedCourse.projectTypes = newProjectTypes;
                 
-                Course.update({ '_id': courses[0]._id }, updatedCourse, callback);
+                Course.update({ '_id': courses[0]._id.toString() }, updatedCourse, callback);
             }
 
         });
     }
 
     return {
-        'bulkCreateCourse': 'bulkCreateCourse'
-        ,'createCourse': 'createCourse'
-        ,'updateCourse': 'updateCourse'
-        ,'removeCourse': 'removeCourse'
-        ,'getCourse': 'getCourse'
-        ,'addProjectType': 'addProjectType'
-        ,'removeProjectType': 'removeProjectType'
+        'bulkCreateCourse': bulkCreateCourse
+        ,'createCourse': createCourse
+        ,'updateCourse': updateCourse
+        ,'removeCourse': removeCourse
+        ,'getCourse': getCourse
+        ,'addProjectType': addProjectType
+        ,'removeProjectType': removeProjectType
     };
 
 })();

@@ -32,18 +32,19 @@ var DocumentRoute = (function() {
     // }
 
     function upload(req, res) {
-        if (req.files.document) {
+        var doc = req.files.document;
+        if (doc) {
 
-            fs.readFile(req.files.document.path, function(err, data) {
-                var dotLocation = req.files.document.name.lastIndexOf('.'),
+            fs.readFile(doc.path, function(err, data) {
+                var dotLocation = doc.name.lastIndexOf('.'),
                     fileName,
                     fileExtension;
                 if (dotLocation > 0) {
-                    fileName = req.files.document.name.substring(0, dotLocation - 1);
-                    fileExtension = '.' + req.files.document.name.substring(dotLocation + 1);
+                    fileName = doc.name.substring(0, dotLocation - 1);
+                    fileExtension = '.' + doc.name.substring(dotLocation + 1);
                 }
                 else {
-                    fileName = req.files.document.name;
+                    fileName = doc.name;
                     fileExtension = '';
                 }
                 var newPath = __dirname + '/../uploaded/ASDR/NEWDOCUMENT' + fileExtension;
@@ -53,7 +54,8 @@ var DocumentRoute = (function() {
                         res.send( JSON.stringify( { 'error': true, 'message': 'Uploading document is failed.' } ) );
                     }
                     else {
-                        res.send( JSON.stringify( { 'success': true, 'message': 'Uploading document is finished.' } ) );
+                        var script = '<script language="javascript" type="text/javascript">window.top.window.stopUpload(\'' + req.params.uploader_name + '\', \'{ status: \\\'OK\\\' }\');</script>';
+                        res.send( script );
                     }
 
                 });

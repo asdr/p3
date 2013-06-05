@@ -1,52 +1,80 @@
 var BSON = require('mongodb').BSONPure,
     User = require('../model/User'),
-    UserRole = require('../core/UserRole');
+    UserRole = require('../core/UserRole'),
+    InstructorController = require('../controllers/InstructorController');
 
 var InstructorRoute = (function() {
-    function _createInstructor(req, res) {
-        res.setHeader('Content-Type', 'application/json');
+    function create(req, res) {
+        var instructors = req.body.instructors;
 
-        if ( !req.body.email || !req.body.password )
-        {
-            res.send( "{ 'error': true, 'message': 'Email or password is missing' }" );
-            return;
-        }
+        console.log('Instructors: ', instructors);
+        InstructorController.createInstructor(instructors, function(err, count) {
+            console.log('args: ', arguments);
+            if (!err) {
+                res.setHeader('Content-Type', 'application/json');
+                res.send('{ "status": "OK" }');
+            }
+        });
+    } 
 
-        User.create( {
-            'firstname': req.body.firstname,
-            'lastname': req.body.lastname,
-            'email': req.body.email,
-            'password': req.body.password,
-            'role': UserRole.Instructor
-        }, 
-        function(err, status) {
-            res.send( JSON.stringify( status[0] ) );
-        } );
-    }
-
-    function _listInstructors(req, res) {
-        res.setHeader('Content-Type', 'application/json');
-        User.get({ 'role': UserRole.Instructor }, function(err, items) {
-            res.send( JSON.stringify( items ) );
+    function remove(req, res) {
+        var key = { '_id': req.params.instructor_id };
+        
+        InstructorController.removeInstructor(key, function(err, count) {
+            console.log(arguments);
+            res.setHeader('Content-Type', 'application/json');
+            if (!err) {
+                if ( count > 0) {
+                    res.send('{ "status": "OK" }');
+                }
+                else
+                {
+                    res.send('{ "status": "error", "message": "not found!" }');
+                }
+            }
         });
     }
 
-    function _removeInstructor(req, res) {
-        var id = req.params.id || '000000000000';
+    function get(req, res) {
+        console.log('get1: ', req.params );
+        var key = { '_id': req.params.instructor_id };
 
-        res.setHeader('Content-Type', 'application/json');
-        User.remove({ '_id': new BSON.ObjectID(id) }, function(err, doc) {
-            if (!err)
+        InstructorController.getInstructor(key, function(err, instructors) {
+            res.setHeader('Content-Type', 'application/json');
+            if (!err) {
+                if (instructors && instructors.length > 0) {
+                    res.send( JSON.stringify({ "status": "OK", "instructor": instructors[0] }) );
+                }
+            }
+            else
             {
-                res.send( "{ 'status': 'ok', 'message': 'Remove successful' }" );
+                res.send( JSON.stringify({ "status": "error", "error": err }) );
+            }
+        });
+    }
+
+    function list(req, res) {
+        console.log('listttt');
+        InstructorController.getInstructor({}, function(err, instructors) {
+            console.log('ins args: ', arguments);
+            res.setHeader('Content-Type', 'application/json');
+            if (!err) {
+                if (instructors) {
+                    res.send( JSON.stringify({ "status": "OK", "instructors": instructors }) );
+                }
+            }
+            else
+            {
+                res.send( JSON.stringify({ "status": "error", "error": err }) );
             }
         });
     }
 
     return {
-        'createInstructor': _createInstructor,
-        'listInstructors': _listInstructors,
-        'removeInstructor': _removeInstructor
+        'create': create
+        ,'get': get
+        ,'remove': remove
+        ,'list': list
     };
 
 })();

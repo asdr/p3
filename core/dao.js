@@ -1,4 +1,5 @@
 var mongo = require('mongodb'),
+    BSON = mongo.BSONPure,
     Db = mongo.Db,
     DBConnector = require('../core/dbconnector').getInstance();
 
@@ -21,6 +22,10 @@ var DAO = function( collection_name ) {
 
         console.log('DAO(', collection_name, ').update');
         
+        if ( key._id ) {
+            key._id = new BSON.ObjectID(key._id);
+        }
+        
         db.collection(collection_name, function(err, collection) {
             collection.update(key, object, callback);
         });
@@ -31,6 +36,10 @@ var DAO = function( collection_name ) {
         var db = DBConnector.db();
         
         console.log('DAO(', collection_name, ').delete');
+
+        if ( key._id ) {
+            key._id = new BSON.ObjectID(key._id);
+        }
 
         db.collection(collection_name, function(err, collection) {
 
@@ -44,6 +53,10 @@ var DAO = function( collection_name ) {
         var db = DBConnector.db();
         
         console.log('DAO(', collection_name, ').get');
+
+        if ( key._id ) {
+            key._id = new BSON.ObjectID(key._id);
+        }
         
         db.collection(collection_name, function(err, collection) {
             collection.find(key||{}).toArray(callback);

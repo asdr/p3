@@ -4,7 +4,11 @@ var express = require('express'),
     AdminRoute = require('./routes/AdminRoute'),
     AuthRoute = require('./routes/AuthRoute'),
     CourseRoute = require('./routes/CourseRoute'),
-    DocumentRoute = require('./routes/DocumentRoute');
+    DocumentRoute = require('./routes/DocumentRoute'),
+    InstructorRoute = require('./routes/InstructorRoute'),
+    AdminController = require('./controllers/AdminController'),
+    InstructorController = require('./controllers/InstructorController'),
+    CourseController = require('./controllers/CourseController');
 
 var API_VERSION = "1.0";
 
@@ -30,20 +34,60 @@ app.get('/v/sidebar', function(req, res) {
 app.get('/v/welcome', function(req, res) {
     res.render('welcome', { 'signedInUser': req.session.user });
 });
+app.get('/v/adminf', function(req, res) {
+    AdminController.getAdmin({}, function(err, admins) {
+        res.render('adminf', { 'signedInUser': req.session.user, 'admins': admins });
+    });
+});
+app.get('/v/instructorf', function(req, res) {
+    InstructorController.getInstructor({}, function(err, instructors) {
+        res.render('instructorf', { 'signedInUser': req.session.user, 'instructors': instructors });
+    });
+});
 
+app.get('/v/coursef', function(req, res) {
+    InstructorController.getInstructor({}, function(err, instructors) {
+        if (!err) {
+            CourseController.getCourse({}, function(err2, courses) {
+                if (!err2) {
+                    res.render('coursef', { 'signedInUser': req.session.user, 'instructors': instructors, 'courses': courses });
+                }
+                else
+                {
+                    res.render('coursef', { 'signedInUser': req.session.user, 'instructors': instructors, 'courses': []  });
+                }
+            });
+        }
+    });
+});
+
+app.get('/v/uploadf', function(req, res) {
+    res.render('uploadf', { 'signedInUser': req.session.user });
+});
 
 //TODO: methods must be configured RESTfully
 app.get('/api/v' + API_VERSION + '/open', ApplicationRoute.open);
 app.post('/api/v' + API_VERSION + '/admin/create', AdminRoute.create);
+app.delete('/api/v' + API_VERSION + '/admin/:admin_id', AdminRoute.remove);
+
+app.get('/api/v' + API_VERSION + '/instructor/all', InstructorRoute.list);
+app.get('/api/v' + API_VERSION + '/instructor/:instructor_id', InstructorRoute.get);
+app.delete('/api/v' + API_VERSION + '/instructor/:instructor_id', InstructorRoute.remove);
+app.post('/api/v' + API_VERSION + '/instructor/create', InstructorRoute.create);
 
 app.post('/api/v' + API_VERSION + '/auth/signin', AuthRoute.signin);
 app.get('/api/v' + API_VERSION + '/auth/signout', AuthRoute.signout);
 
 app.get('/api/v' + API_VERSION + '/course/list', CourseRoute.listCourses);
 app.post('/api/v' + API_VERSION + '/course', CourseRoute.createCourse);
-app.delete('/api/v' + API_VERSION + '/course', CourseRoute.removeCourse);
 app.get('/api/v' + API_VERSION + '/course/:course_name', CourseRoute.listCourses);
-app.post('/api/v' + API_VERSION + '/document/upload', DocumentRoute.upload);
+app.post('/api/v' + API_VERSION + '/course/excel', CourseRoute.createByExcelFile);
+app.delete('/api/v' + API_VERSION + '/course/:course_id', CourseRoute.removeCourse);
+app.post('/api/v' + API_VERSION + '/course/projecttype', CourseRoute.addProjectType);
+app.delete('/api/v' + API_VERSION + '/course/projecttype/:course_id', CourseRoute.removeProjectType);
+app.post('/api/v' + API_VERSION + '/course/classlist', CourseRoute.createClassList);
+
+app.post('/api/v' + API_VERSION + '/document/upload/:uploader_name', DocumentRoute.upload);
 
 // admin CRUD functions is not available over API
 // for security reasons

@@ -1,0 +1,95 @@
+
+<h2 class="content-title">Course Operations</h2>
+
+<div class="pr create">
+    <b>Create course manually: </b><br />
+    <ul class="create_course">
+        <li>Course code: <span class="input"><input name="course_code" type="text" /></span></li>
+        <li>Course name: <span class="input"><input name="course_name" type="text" /></span></li>
+        <li>course year: <span class="input"><input name="course_year" type="text" /></span></li>
+        <li>course semester: <span class="input"><input name="course_semester" type="text" /></span></li>
+        <li>Instructor: <span class="input">
+            <select>
+                <option value="-1">Select an instructor</option>
+                <%
+                    for (var i=0, len=instructors.length; i<len; ++i) {
+                    %>
+
+                    <option value="<%= instructors[i]._id %>"><%= instructors[i].email %></option>
+
+                    <%
+                    }
+                %>
+            </select>
+        </span></li>
+        <li><span class="button"><input name="create" type="button" value="Create" /></span></li>
+    </ul>
+</div>
+
+<div class="pr excel">
+    <b>Create course by Excel file: </b><br />
+</div>
+
+<div class="pr list">
+    <b>List of courses: </b><br />
+    <%
+    for (var i=0, len=courses.length; i<len; ++i) {
+        %>
+        <div class="single_course">
+            <input name="course_id" type="hidden" value="<%= courses[i]._id %>" />
+            <div class="name"><%= courses[i].name %> </div>
+            <div class="code"><%= courses[i].code %> </div>
+            <div class="year"><%= courses[i].year %> </div>
+            <div class="semester"><%= courses[i].semester %></div>
+            <div class="projectTypes">
+                <select>
+                    <option value='-1'>List of Project Types</option>
+                    <%
+                    if (courses[i].projectTypes) {
+                        for (var k=0, len2=courses[i].projectTypes.length; k<len2; ++k) {
+                            %>
+                            <option value="<%= courses[i].projectTypes[k].name %>"><%= courses[i].projectTypes[k].name||'' %>/<%= courses[i].projectTypes[k].deadline||'' %></option>
+                            <%
+                        }
+                    }
+                    %>
+                </select>
+            </div>
+            <div class="email"><%= courses[i].instructor_email %></div> <br />
+            <div class="remove"><input type="button" value="Remove" /></div>
+            <div class="addpt"><input type="button" value="Add ProjectType" /></div>
+            <div class="removept"><input type="button" value="Remove ProjectType" /></div>
+        </div>
+        <%
+    }
+    %>
+</div>
+
+<div class="pr classlist_create">
+    <p/>
+    <b>Create ClassList</b><br />
+    <select>
+        <option value='-1'>List of Courses</option>
+        <%
+            for (var i=0, len=courses.length; i<len; ++i) {
+                %>
+                <option value="<%= courses[i]._id %>"><%= courses[i].code %> / <%= courses[i].year %><%= courses[i].semester %></option>
+                <%
+            }
+        %>
+    </select>
+    <br />
+    <%
+    for (var i=0, len=10; i<len; ++i) {
+        %>
+        <input type="text" name="student_no" placeholder="Student No" />
+        <input type="text" name="student_firstname" placeholder="First Name" />
+        <input type="text" name="student_lastname" placeholder="Last Name" />
+        <input type="text" name="student_email" placeholder="Email" />
+        <br />
+        <%
+    }
+    %>
+    <input type="button" value="Create CLassList" />
+</div>
+

@@ -28,19 +28,19 @@ var AdminController = (function() {
     }
 
     function bulkCreateAdmin(admins, callback) {
-        var validStudents = [];
+        var validAdmins = [];
         for (var i=0, len=admins.length; i<len; ++i) {
             if ( admins[i].email )
             {
                 if (admins[i].role) delete admins[i].role;
                 _.extend(admins[i], { 'role': UserRole.Administrator });
 
-                validStudents.push( admins[i] );
+                validAdmins.push( admins[i] );
             }
         }
 
-        if (validStudents.length > 0) {
-            User.create( validStudents, callback );
+        if (validAdmins.length > 0) {
+            User.create( validAdmins, callback );
         }
         else
         {
@@ -49,14 +49,17 @@ var AdminController = (function() {
     }
 
     function updateAdmin(key, admin, callback) {
+        key.role = UserRole.Administrator;
         User.update(key, admin, callback);
     }
 
     function removeAdmin(key, callback) {
+        key.role = UserRole.Administrator;
         User.remove(key, callback);
     }
 
     function getAdmin(key, callback) {
+        key.role = UserRole.Administrator;
         User.get(key, callback);
     }
 

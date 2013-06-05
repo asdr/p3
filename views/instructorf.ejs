@@ -1,0 +1,32 @@
+
+<h2 class="content-title">Instructor Operations</h2>
+
+<div class="pr">
+    <b>Create instructor: </b><br />
+    <ul class="create_instructor">
+        <li>FirstName: <input name="firstname" type="text" /></li>
+        <li>LastName: <input name="lastname" type="text" /></li>
+        <li>Email Address: <input name="email" type="text" /></li>
+        <li><input name="create" type="button" value="Create" /></li>
+    </ul>
+</div>
+
+<div class="pr">
+    <b>List of instructors:</b> <br />
+    <% 
+        for (var i=0; i<instructors.length; ++i) {
+        %>
+        <div class="single_admin_container">
+            <div class="single_instructor">
+                <input type="hidden" name="instructor_id" value="<%= instructors[i]._id %>" />
+                <div class="email"><%= instructors[i].email %></div>
+                <div class="buttons"><input name="remove" type="button" value="Remove" /></div>
+            </div>
+        </div>
+        <%
+        }
+     %>
+</div>
+
+<div class="pr">
+</div>

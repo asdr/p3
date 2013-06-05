@@ -10,12 +10,31 @@ var AdminRoute = (function() {
 
         AdminController.createAdmin(admins, function(result) {
             res.setHeader('Content-Type', 'application/json');
-            res.send('{ status: "OK" }');
+            res.send('{ "status": "OK" }');
         });
     } 
 
+    function remove(req, res) {
+        var key = { '_id': req.params.admin_id };
+        
+        AdminController.removeAdmin(key, function(err, count) {
+            console.log(arguments);
+            res.setHeader('Content-Type', 'application/json');
+            if (!err) {
+                if ( count > 0) {
+                    res.send('{ "status": "OK" }');
+                }
+                else
+                {
+                    res.send('{ "status": "error", "message": "not found!" }');
+                }
+            }
+        });
+    }
+
     return {
         'create': create
+        ,'remove': remove
     };
 
 })();

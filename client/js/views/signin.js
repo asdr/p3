@@ -36,7 +36,6 @@
 
         PUES.ViewLoader.load({
             'viewName': 'welcome'
-            ,'selector': '.panel_container > .page'
             ,'clearBeforeLoad': true
         });
     }

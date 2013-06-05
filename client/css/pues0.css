@@ -174,5 +174,50 @@ a, a:active, a:hover, a:visited {
 .panel_container > .page {
     margin-left: 20px;
     margin-top: 20px;
-    margin-right: 240px;
+    margin-right: 420px;
 }
+
+.single_admin {
+    display: block;
+}
+
+.single_admin .email {
+    display: inline-block;
+    padding-top: 8px;
+    padding-bottom: 8px; 
+}
+
+.single_admin .buttons {
+    display: inline-block;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+
+.single_instructor {
+    display: block;
+}
+
+.single_instructor .email {
+    display: inline-block;
+    padding-top: 8px;
+    padding-bottom: 8px; 
+}
+
+.single_instructor .buttons {
+    display: inline-block;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.single_course {
+    display: block;
+}
+
+.single_course > * {
+    display: inline-block;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+

@@ -1,6 +1,11 @@
-var BSON = require('mongodb').BSONPure,
+var _ = require('underscore'),
+    fs = require('fs'),
+    BSON = require('mongodb').BSONPure,
     Course = require('../model/Course'),
-    UserRole = require('../core/UserRole');
+    UserRole = require('../core/UserRole'),
+    InstructorController = require('../controllers/InstructorController'),
+    CourseController = require('../controllers/CourseController'),
+    ClassListController = require('../controllers/ClassListController');
 
 var CourseRoute = (function() {
     function _createCourse(req, res) {
@@ -15,47 +20,161 @@ var CourseRoute = (function() {
             return;
         }
 
-        Course.create( {
-            'code': req.body.course_code,
-            'name': req.body.course_name,
-            'year': req.body.course_year,
-            'semester': req.body.course_semester,
-            'instructor': req.body.course_instructor
-        }, 
-        function(err, status) {
-            res.send( JSON.stringify( status[0] ) );
-        } );
+        InstructorController.getInstructor({ '_id': req.body.instructor_id }, function(err, instructors) {
+            if (!err) {
+                CourseController.createCourse( {
+                    'code': req.body.course_code
+                    ,'name': req.body.course_name
+                    ,'year': req.body.course_year
+                    ,'semester': req.body.course_semester
+                    ,'instructor_firstname': instructors[0].firstname
+                    ,'instructor_lastname': instructors[0].lastname
+                    ,'instructor_email': instructors[0].email
+                }, 
+                function(err) {
+                    if (!err) {
+                        res.send( JSON.stringify( { 'status': 'OK' } ) );    
+                    }
+                    else {
+                        res.send( JSON.stringify( { 'status': 'error', 'error': err } ) );
+                    }
+                } );
+            }
+        });
     }
 
     function _listCourses(req, res) {
         res.setHeader('Content-Type', 'application/json');
-        var key = {};
-        if (req.params.course_name)
-        {
-            key.course_name = req.body.course_name;
-        }
-        Course.get(key, function(err, items) {
-            res.send( JSON.stringify( items ) );
+        
+        CourseController.getCourse({}, function(err, courses) {
+            if (!err) {
+                res.send( JSON.stringify({ 'status': 'OK', 'courses': courses }) );
+            }
+            else {
+                res.send( JSON.stringify( { 'status': 'error', 'error': err } ) );
+            }
         });
     }
 
     function _removeCourse(req, res) {
-        var id = req.body.id || '000000000000';
-
         res.setHeader('Content-Type', 'application/json');
-        Course.remove({ '_id': new BSON.ObjectID(id) }, function(err, doc) {
+        
+        var id = req.params.course_id || '000000000000';
+        console.log(id);
+        CourseController.removeCourse({ '_id': id }, function(err, doc) {
             if (!err)
             {
-                res.setHeader('Content-Type', 'application/json');
-                res.send( "{ 'status': 'OK', 'message': 'Remove successful' }" );
+                res.send( JSON.stringify( { 'status': 'OK', 'message': 'Remove successful' } ) );
+            }
+            else {
+                res.send( JSON.stringify( { 'status': 'error', 'error': err } ) );
+            }
+        });
+    }
+
+    function _createByExcelFile(req, res) {
+        if (req.files.myfile) {
+
+            var doc = req.files.myfile;
+
+            fs.readFile(doc.path, function(err, data) {
+                var dotLocation = doc.name.lastIndexOf('.'),
+                    fileName,
+                    fileExtension;
+                if (dotLocation > 0) {
+                    fileName = doc.name.substring(0, dotLocation - 1);
+                    fileExtension = '.' + doc.name.substring(dotLocation + 1);
+                }
+                else {
+                    fileName = doc.name;
+                    fileExtension = '';
+                }
+                var newPath = __dirname + '/../uploaded/ASDR/NEWDOCUMENT' + fileExtension;
+
+                fs.writeFile(newPath, data, { flag: 'w' }, function(err) {
+                    if (err) {
+                        res.send( JSON.stringify( { 'status': 'error', 'error': err, 'message': 'Uploading document is failed.' } ) );
+                    }
+                    else {
+                        res.send( JSON.stringify( { 'success': true, 'message': 'Uploading document is finished.' } ) );
+                    }
+
+                });
+            });
+
+        }
+    }
+
+    function _addProjectType(req, res) {
+        var course_id = req.body.course_id || '000000000000',
+            projectType = req.body.projectType;
+
+        CourseController.addProjectType({ '_id': ""+course_id }, projectType, function(err, count) {
+            if (!err) {
+                res.send( '{ "status": "OK" }' );
+            }
+            else {
+                res.send( JSON.stringify( { 'status': 'error', 'error': err } ) );
+            }
+        });
+    }
+
+    function _removeProjectType(req, res) {
+        var course_id = req.params.course_id || '000000000000',
+            projectType = req.body.projectType;
+
+        CourseController.removeProjectType({ '_id': ""+course_id }, projectType, function(err, count) {
+            if (!err) {
+                res.send( '{ "status": "OK" }' );
+            }
+            else {
+                res.send( JSON.stringify( { 'status': 'error', 'error': err } ) );
+            }
+        });
+    }
+
+    function _createClassList(req, res) {
+        var course_id = req.body.course_id || '000000000000',
+            students = req.body.students,
+            newStd = [];
+
+        console.log('students: ', students);
+        for (var i=0;i<students.length; ++i) {
+            if (!students[i].no ||
+                !students[i].email ||
+                !students[i].firstname ||
+                !students[i].lastname ) {
+                continue;
+            }
+
+            newStd.push(students[i]);
+        }
+
+        console.log('newStd: ', newStd);
+
+        if (newStd.length == 0) {
+            res.send( JSON.stringify( { 'status': 'error', 'message': 'Student missing' } ) );
+            return;
+        }
+
+        ClassListController.createClassList({ '_id': course_id}, newStd, function(err, classList) {
+            if (!err) {
+                res.send( JSON.stringify( { 'status': 'OK' } ) );
+            }
+            else {
+                res.send( JSON.stringify( { 'status': 'error', 'error': err } ) );
             }
         });
     }
 
     return {
-        'createCourse': _createCourse,
-        'listCourses': _listCourses,
-        'removeCourse': _removeCourse
+        'createCourse': _createCourse
+        ,'listCourses': _listCourses
+        ,'removeCourse': _removeCourse
+        ,'createByExcelFile': _createByExcelFile
+        ,'addProjectType': _addProjectType
+        ,'removeProjectType': _removeProjectType
+        ,'createClassList': _createClassList
     };
 
 })();
