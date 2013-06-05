@@ -23,22 +23,31 @@ app.configure(function () {
     app.use(express.session());
 });
 
-AdminController.getAdmin({}, function(err, admins) {
-    if (admins.length == 0) {
-        AdminController.createAdmin({
-            'email': 'admin'
-            ,'firstname': 'admin'
-            ,'lastname':'admin'
-        }, function(err) {
-            ;
-        });
-    }
-});
-
 app.get('/v/index', function(req, res) {
-    res.render('index', { 'signedInUser': req.session.user });
+
+    AdminController.getAdmin({}, function(err, admins) {
+        console.log(admins);
+        if (admins.length == 0) {
+            AdminController.createAdmin({
+                'email': 'admin'
+                ,'firstname': 'admin'
+                ,'lastname':'admin'
+            }, function(err) {
+                if (!err) {
+                    res.render('index', { 'signedInUser': req.session.user });
+                }            
+            });
+        }
+        else
+        {
+            console.log('here');
+            res.render('index', { 'signedInUser': req.session.user });
+        }
+    });
+    
 });
 app.get('/v/signin', function(req, res) {
+
     res.render('signin', { 'signedInUser': req.session.user });
 });
 app.get('/v/sidebar', function(req, res) {
