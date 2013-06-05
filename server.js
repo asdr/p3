@@ -23,6 +23,18 @@ app.configure(function () {
     app.use(express.session());
 });
 
+AdminController.getAdmin({}, function(err, admins) {
+    if (admins.length == 0) {
+        AdminController.createAdmin({
+            'email': 'admin'
+            ,'firstname': 'admin'
+            ,'lastname':'admin'
+        }, function(err,) {
+            ;
+        });
+    }
+});
+
 app.get('/v/index', function(req, res) {
     res.render('index', { 'signedInUser': req.session.user });
 });
