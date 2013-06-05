@@ -1,0 +1,23 @@
+
+<div class="pr grades">
+    <b>Evaluate document: </b><br />
+    <select name="course_id">
+        <option value='-1'>-- Courses --</option>
+        <%
+            for (var i=0, len=courses.length; i<len; ++i) {
+                %>
+                <option value="<%= courses[i]._id %>"><%= courses[i].code %> / <%= courses[i].year %><%= courses[i].semester %></option>
+                <%
+            }
+        %>
+    </select>
+    <select class="projectTypes" name="projectType">
+        <option value='-1'>-- Project Types --</option>
+    </select>
+    <br />
+</div>
+
+<div class="pr grades2">
+    Grade for student document: <input type="text" name="grade" /><br />
+    Comment on document: <input type="text" name="comment" />
+</div>

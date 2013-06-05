@@ -8,13 +8,27 @@ var fs = require('fs'),
 
 var DocumentController = (function() {
 
-    function uploadDocument(course, projectType, path, name, extension, data) {
+    function createDocument(doc, callback) {
+        Document.create(doc, callback);
+    }
 
+    function getDocument(key, callback) {
+        Document.get(key, callback);
+    }
+
+    function removeDocument(key, callback) {
+        Document.remove(key, callback);
+    }
+
+    function updateDocument(key, doc, callback) {
+        Document.update(key, doc, callback);
     }
 
     return {
-        'uploadDocument': uploadDocument,
-        
+        'createDocument': createDocument
+        ,'getDocument': getDocument
+        ,'removeDocument': removeDocument
+        , 'updateDocument': updateDocument
     };
 
 })();

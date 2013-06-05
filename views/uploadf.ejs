@@ -1,3 +1,24 @@
+
 <div class="pr upload">
     <b>Upload document: </b><br />
+    <select>
+        <option value='-1'>List of Courses</option>
+        <%
+            for (var i=0, len=courses.length; i<len; ++i) {
+                %>
+                <option value="<%= courses[i]._id %>"><%= courses[i].code %> / <%= courses[i].year %><%= courses[i].semester %></option>
+                <%
+            }
+        %>
+    </select>
+    <br />
+    <select>
+        <option value='-1'>List of Project Types</option>
+        <option value='Interim Report'>Interim Report</option>
+        <option value='Final Report'>Final Report</option>
+        <option value='Plagiarism Report'>Plagiarism Report</option>
+        <option value='Source Code'>Source Code</option>
+        <option value='Presentation'>Presentation</option>
+    </select>
+    <br />
 </div>

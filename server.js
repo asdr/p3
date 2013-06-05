@@ -8,7 +8,8 @@ var express = require('express'),
     InstructorRoute = require('./routes/InstructorRoute'),
     AdminController = require('./controllers/AdminController'),
     InstructorController = require('./controllers/InstructorController'),
-    CourseController = require('./controllers/CourseController');
+    CourseController = require('./controllers/CourseController'),
+    ClassListController = require('./controllers/ClassListController');
 
 var API_VERSION = "1.0";
 
@@ -62,7 +63,47 @@ app.get('/v/coursef', function(req, res) {
 });
 
 app.get('/v/uploadf', function(req, res) {
-    res.render('uploadf', { 'signedInUser': req.session.user });
+    ClassListController.hasStudent(req.session.user, function(err, myCourses) {
+        if (!err) {
+            res.render('uploadf', { 'signedInUser': req.session.user, 'courses': myCourses });
+        }
+        else {
+            res.render('uploadf', { 'signedInUser': req.session.user, 'courses': [] });
+        }
+    });
+});
+
+app.get('/v/displayf', function(req, res) {
+    CourseController.getCourse({ 'instructor_email': req.session.user.email }, function(err, courses) {
+        if (!err) {
+            res.render('displayf', { 'signedInUser': req.session.user, 'courses': courses });
+        }
+        else {
+            res.render('displayf', { 'signedInUser': req.session.user, 'courses': [] });
+        }
+    });
+});
+
+app.get('/v/evaluatef', function(req, res) {
+    CourseController.getCourse({ 'instructor_email': req.session.user.email }, function(err, courses) {
+        if (!err) {
+            res.render('evaluatef', { 'signedInUser': req.session.user, 'courses': courses });
+        }
+        else {
+            res.render('evaluatef', { 'signedInUser': req.session.user, 'courses': [] });
+        }
+    });
+});
+
+app.get('/v/gradesf', function(req, res) {
+    ClassListController.hasStudent(req.session.user, function(err, myCourses) {
+        if (!err) {
+            res.render('gradesf', { 'signedInUser': req.session.user, 'courses': myCourses });
+        }
+        else {
+            res.render('gradesf', { 'signedInUser': req.session.user, 'courses': [] });
+        }
+    });
 });
 
 //TODO: methods must be configured RESTfully
@@ -80,14 +121,20 @@ app.get('/api/v' + API_VERSION + '/auth/signout', AuthRoute.signout);
 
 app.get('/api/v' + API_VERSION + '/course/list', CourseRoute.listCourses);
 app.post('/api/v' + API_VERSION + '/course', CourseRoute.createCourse);
-app.get('/api/v' + API_VERSION + '/course/:course_name', CourseRoute.listCourses);
+app.get('/api/v' + API_VERSION + '/course/:course_id', CourseRoute.listCourses);
 app.post('/api/v' + API_VERSION + '/course/excel', CourseRoute.createByExcelFile);
 app.delete('/api/v' + API_VERSION + '/course/:course_id', CourseRoute.removeCourse);
 app.post('/api/v' + API_VERSION + '/course/projecttype', CourseRoute.addProjectType);
 app.delete('/api/v' + API_VERSION + '/course/projecttype/:course_id', CourseRoute.removeProjectType);
 app.post('/api/v' + API_VERSION + '/course/classlist', CourseRoute.createClassList);
+app.get('/api/v' + API_VERSION + '/course/classlist/:course_id', CourseRoute.getClassList);
 
+
+app.post('/api/v' + API_VERSION + '/document', DocumentRoute.getDocument);
+app.post('/api/v' + API_VERSION + '/document/name', DocumentRoute.getDocumentName);
 app.post('/api/v' + API_VERSION + '/document/upload/:uploader_name', DocumentRoute.upload);
+app.post('/api/v' + API_VERSION + '/document/download', DocumentRoute.download);
+app.post('/api/v' + API_VERSION + '/document/evaluate', DocumentRoute.evaluate);
 
 // admin CRUD functions is not available over API
 // for security reasons
@@ -98,3 +145,4 @@ app.post('/api/v' + API_VERSION + '/document/upload/:uploader_name', DocumentRou
 
 app.listen(3000);
 console.log('Listening on port 3000...');
+

@@ -120,7 +120,7 @@
                 names = document.getElementsByName('student_firstname'),
                 lnames = document.getElementsByName('student_lastname'),
                 emails = document.getElementsByName('student_email'),
-                course_id = $(this).find('.pr.classlist_create select').val();
+                course_id = $this.find('.pr.classlist_create select').val();
 
             for (var i=0; i<10; ++i) {
                 var student = {};

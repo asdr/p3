@@ -30,6 +30,27 @@
             });
         });
 
+        this.find('.displayf').on('click', function() {
+            PUES.ViewLoader.load({
+                'viewName': 'displayf'
+                ,'clearBeforeLoad': true
+            });
+        });
+
+        this.find('.evaluatef').on('click', function() {
+            PUES.ViewLoader.load({
+                'viewName': 'evaluatef'
+                ,'clearBeforeLoad': true
+            });
+        });
+
+        this.find('.gradesf').on('click', function() {
+            PUES.ViewLoader.load({
+                'viewName': 'gradesf'
+                ,'clearBeforeLoad': true
+            });
+        });
+
     });
 
 })();

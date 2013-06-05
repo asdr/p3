@@ -6,16 +6,17 @@
           return true;
     }
 
-    function stopUpload( name, success ){
-          var result = '';
-          if (success == 1) {
+    function stopUpload( name, response ){
+          var result = '',
+              response = JSON.parse(response);
+          if (response.status == 'OK') {
              result = '<span class="msg">The file was uploaded successfully!<\/span><br/><br/>';
           }
           else {
              result = '<span class="emsg">There was an error during file upload!<\/span><br/><br/>';
           }
           document.getElementById(name + '_upload_process').style.visibility = 'hidden';
-          document.getElementById(name + '_upload_form').innerHTML = result + '<label>File: <input name="myfile" type="file" size="30" /><\/label><label><input type="submit" name="submitBtn" class="sbtn" value="Upload" /><\/label>';
+          document.getElementById(name + '_upload_form').innerHTML = result + '<label>File: <input name="document" type="file" size="30" /><\/label><label><input type="submit" name="submitBtn" class="sbtn" value="Upload" /><\/label>';
           document.getElementById(name + '_upload_form').style.visibility = 'visible';
           return true;
     }

@@ -46,7 +46,12 @@ var CourseRoute = (function() {
     function _listCourses(req, res) {
         res.setHeader('Content-Type', 'application/json');
         
-        CourseController.getCourse({}, function(err, courses) {
+        var key = {};
+        if (req.params.course_id) {
+            key._id = req.params.course_id || '000000000000';
+        }
+
+        CourseController.getCourse(key, function(err, courses) {
             if (!err) {
                 res.send( JSON.stringify({ 'status': 'OK', 'courses': courses }) );
             }
@@ -73,6 +78,7 @@ var CourseRoute = (function() {
     }
 
     function _createByExcelFile(req, res) {
+        res.setHeader('Content-Type', 'application/json');
         if (req.files.myfile) {
 
             var doc = req.files.myfile;
@@ -106,6 +112,7 @@ var CourseRoute = (function() {
     }
 
     function _addProjectType(req, res) {
+        res.setHeader('Content-Type', 'application/json');
         var course_id = req.body.course_id || '000000000000',
             projectType = req.body.projectType;
 
@@ -120,6 +127,7 @@ var CourseRoute = (function() {
     }
 
     function _removeProjectType(req, res) {
+        res.setHeader('Content-Type', 'application/json');
         var course_id = req.params.course_id || '000000000000',
             projectType = req.body.projectType;
 
@@ -134,6 +142,8 @@ var CourseRoute = (function() {
     }
 
     function _createClassList(req, res) {
+        res.setHeader('Content-Type', 'application/json');
+
         var course_id = req.body.course_id || '000000000000',
             students = req.body.students,
             newStd = [];
@@ -167,6 +177,27 @@ var CourseRoute = (function() {
         });
     }
 
+    function getClassList(req, res) {
+        res.setHeader('Content-Type', 'application/json');
+        
+        var course_id = req.params.course_id;
+
+        ClassListController.getClassList({ '_id': course_id }, function(err, classLists) {
+            if (!err) {
+                if (classLists.length > 0) {
+                    res.send(JSON.stringify( { 'status': 'OK', 'classList': classLists[0] } ));
+                }
+                else
+                {
+                    res.send(JSON.stringify( { 'status': 'OK', 'classList': [] } ));   
+                }
+            }
+            else {
+                res.send( JSON.stringify( { 'status': 'error', 'error': err } ) );
+            }
+        }); 
+    }
+
     return {
         'createCourse': _createCourse
         ,'listCourses': _listCourses
@@ -175,6 +206,7 @@ var CourseRoute = (function() {
         ,'addProjectType': _addProjectType
         ,'removeProjectType': _removeProjectType
         ,'createClassList': _createClassList
+        ,'getClassList': getClassList
     };
 
 })();
